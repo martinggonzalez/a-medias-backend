@@ -1,0 +1,55 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  forward-headers-strategy: native   # detrás del proxy de Render; el límite de login usa la IP real
+
+spring:
+  application:
+    name: a-medias-api
+  datasource:
+    # Formato JDBC. Neon: jdbc:postgresql://<host>/<db>?sslmode=require
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/amedias}
+    username: ${DATABASE_USER:amedias}
+    password: ${DATABASE_PASSWORD:amedias}
+    hikari:
+      maximum-pool-size: 4
+      minimum-idle: 0
+      max-lifetime: 300000      # 5 min: Neon suspende y corta conexiones inactivas
+      idle-timeout: 120000
+      connection-timeout: 30000 # margen para despertar la BD
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 9MB
+  jackson:
+    default-property-inclusion: always
+    mapper:
+      allow-coercion-of-scalars: false   # "true" (texto) no vale como booleano ni "12" como entero
+    deserialization:
+      accept-float-as-int: false         # 12.5 no se trunca a 12
+      fail-on-null-for-primitives: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+app:
+  jwt-secret: ${JWT_SECRET}               # mínimo 32 caracteres
+  jwt-ttl-minutes: ${JWT_TTL_MINUTES:720}
+  frontend-origins: ${FRONTEND_ORIGINS:http://localhost:3000}
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-3.5-flash}   # comprueba el modelo vigente en AI Studio
+  seed:
+    adela-email: ${ADELA_EMAIL:}
+    adela-password: ${ADELA_PASSWORD:}
+    martin-email: ${MARTIN_EMAIL:}
+    martin-password: ${MARTIN_PASSWORD:}

@@ -1,0 +1,14 @@
+# Solo para desarrollo local. En producción se usa Neon.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: amedias
+      POSTGRES_USER: amedias
+      POSTGRES_PASSWORD: amedias
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
